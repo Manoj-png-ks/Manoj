@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manoj Kumar Sekar | Digital Data Analyst</title>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.12.16/dist/framer-motion.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Italiana&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --obsidian: #030303;
+            --liquid-silver: #e0e0e0;
+            --accent-glow: #ff5500;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--liquid-silver);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            cursor: none;
+        }
+
+        .font-display {
+            font-family: 'Italiana', serif;
+        }
+
+        .font-hero {
+            font-family: 'Syncopate', sans-serif;
+        }
+
+        /* Liquid Noise Filter */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            filter: url(#liquidFilter);
+            background: radial-gradient(circle at 50% 50%, #1a1a1a, #000);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-liquid {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+            position: relative;
+        }
+
+        .text-liquid::before {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: white;
+            width: 0%;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: fillText 2s cubic-bezier(0.16, 1, 0.3, 1) forwards 1s;
+        }
+
+        @keyframes fillText {
+            to {
+                width: 100%;
+            }
+        }
+
+        /* Custom Cursor */
+        #cursor-dot,
+        #cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+        }
+
+        #cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        body.hovering #cursor-outline {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(2px);
+            border: none;
+        }
+
+        /* Intro Overlay */
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Liquid SVG Filters -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="liquidFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" result="noise" seed="0">
+                <animate attributeName="baseFrequency" dur="30s" values="0.005;0.002;0.005" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" />
+            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" />
+        </filter>
+        <filter id="glassDistort">
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" />
+        </filter>
+    </svg>
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-outline"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { motion, AnimatePresence, useScroll, useTransform } = window.Motion;
+
+        // --- HOOKS ---
+        const useMousePosition = () => {
+            const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+            useEffect(() => {
+                const updateMousePosition = e => setMousePosition({ x: e.clientX, y: e.clientY });
+                window.addEventListener("mousemove", updateMousePosition);
+                return () => window.removeEventListener("mousemove", updateMousePosition);
+            }, []);
+            return mousePosition;
+        };
+
+        const Cursor = () => {
+            const { x, y } = useMousePosition();
+            const dotRef = useRef(null);
+            const outlineRef = useRef(null);
+
+            useEffect(() => {
+                if (dotRef.current) {
+                    dotRef.current.style.left = `${x}px`;
+                    dotRef.current.style.top = `${y}px`;
+                }
+                if (outlineRef.current) {
+                    outlineRef.current.animate({
+                        left: `${x}px`,
+                        top: `${y}px`
+                    }, { duration: 500, fill: "forwards" });
+                }
+            }, [x, y]);
+
+            useEffect(() => {
+                const hoverables = document.querySelectorAll('a, button, .interactive');
+                const addClass = () => document.body.classList.add('hovering');
+                const removeClass = () => document.body.classList.remove('hovering');
+                
+                hoverables.forEach(el => {
+                    el.addEventListener('mouseenter', addClass);
+                    el.addEventListener('mouseleave', removeClass);
+                });
+                return () => {
+                    hoverables.forEach(el => {
+                        el.removeEventListener('mouseenter', addClass);
+                        el.removeEventListener('mouseleave', removeClass);
+                    });
+                }
+            });
+
+            return null; // Logic handled via refs to existing DOM elements for perf
+        };
+
+        // --- COMPONENTS ---
+
+        const Intro = ({ onComplete }) => {
+            return (
+                <motion.div 
+                    className="intro-overlay"
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 0 }}
+                    transition={{ duration: 1, delay: 2.5, ease: "easeInOut" }}
+                    onAnimationComplete={onComplete}
+                >
+                    <div className="relative overflow-hidden">
+                        <motion.h1 
+                            className="text-8xl md:text-[12rem] font-bold font-hero text-white leading-none tracking-tighter mix-blend-difference"
+                            initial={{ y: 200, skewY: 10 }}
+                            animate={{ y: 0, skewY: 0 }}
+                            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                            MANOJ
+                        </motion.h1>
+                         <motion.div 
+                            className="h-2 bg-white mt-4"
+                            initial={{ width: 0 }}
+                            animate={{ width: "100%" }}
+                            transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
+                        />
+                    </div>
+                </motion.div>
+            );
+        };
+
+        const Hero = () => {
+            return (
+                <section className="min-h-screen flex flex-col justify-center px-6 md:px-24 relative overflow-hidden">
+                    {/* Floating Liquid Background Elements */}
+                    <div className="absolute inset-0 liquid-bg">
+                         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-900 rounded-full blur-[100px] opacity-30 animate-pulse"></div>
+                         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-900 rounded-full blur-[120px] opacity-30 animate-pulse" style={{animationDelay: '2s'}}></div>
+                    </div>
+
+                    <div className="z-10 relative">
+                        <motion.div
+                            initial={{ opacity: 0, filter: "blur(20px)" }}
+                            animate={{ opacity: 1, filter: "blur(0px)" }}
+                            transition={{ duration: 1.5, delay: 2.8 }}
+                        >
+                            <h2 className="font-display text-xl md:text-2xl text-white/60 mb-6 tracking-[0.3em] uppercase">
+                                Digital Architect
+                            </h2>
+                            
+                            <h1 className="font-hero text-6xl md:text-9xl font-bold uppercase leading-tight mb-8">
+                                <span className="block text-liquid" data-text="Manoj">Manoj</span>
+                                <span className="block text-liquid" data-text="Kumar" style={{ transitionDelay: '0.2s' }}>Kumar</span>
+                            </h1>
+
+                            <p className="max-w-2xl text-lg md:text-xl text-white/50 font-light leading-relaxed mb-12 backdrop-blur-sm">
+                                I deconstruct complex data to build <span className="text-white font-medium">clarity</span>. 
+                                Transforming raw signals into high-impact digital experiences.
+                            </p>
+
+                            <div className="flex flex-wrap gap-6">
+                                <a href="#work" className="group relative px-8 py-4 bg-white/10 glass-panel rounded-full overflow-hidden interactive">
+                                    <span className="relative z-10 text-sm font-bold tracking-widest uppercase group-hover:text-black transition-colors duration-300">View Work</span>
+                                    <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                                </a>
+                                <a href="https://www.linkedin.com/in/manoj-kumar0911/" target="_blank" className="px-8 py-4 text-white/70 hover:text-white flex items-center gap-3 text-sm tracking-widest uppercase interactive group">
+                                    LinkedIn
+                                    <i data-lucide="arrow-right" className="group-hover:translate-x-1 transition-transform"></i>
+                                </a>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+            );
+        };
+
+        const GlassToggle = ({ label }) => (
+            <div className="interactive cursor-pointer group">
+                <div className="w-16 h-8 bg-white/5 rounded-full border border-white/10 relative p-1 transition-colors group-hover:border-white/30">
+                    <div className="w-6 h-6 bg-white/20 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)] backdrop-blur-md group-hover:bg-white group-hover:translate-x-8 transition-all duration-500 ease-[0.22,1,0.36,1]"></div>
+                </div>
+                <span className="text-[10px] uppercase tracking-widest mt-2 block text-center opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
+            </div>
+        );
+
+        const WorkCard = ({ title, cat, img }) => {
+            return (
+                <div className="group relative w-full aspect-[4/3] glass-panel rounded-2xl overflow-hidden interactive">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity"></div>
+                    <div className="absolute bottom-0 left-0 p-8 z-20">
+                        <span className="text-xs text-[var(--accent-glow)] uppercase tracking-widest mb-2 block">{cat}</span>
+                        <h3 className="font-display text-4xl text-white mb-2 group-hover:-translate-y-2 transition-transform duration-500">{title}</h3>
+                        <div className="h-[1px] w-0 bg-white group-hover:w-full transition-all duration-700 delay-100"></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+             useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, []);
+
+            return (
+                <div className="relative">
+                    <Cursor />
+                    <Intro />
+                    
+                    {/* Overlay Grid */}
+                    <div className="fixed inset-0 z-50 pointer-events-none opacity-[0.03]" style={{backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '100px 100px'}}></div>
+
+                    <nav className="fixed top-0 left-0 w-full p-8 flex justify-between items-start z-40 mix-blend-difference">
+                        <div className="flex flex-col gap-1">
+                            <span className="font-hero text-2xl font-bold tracking-tighter">MKS<span className="text-[var(--accent-glow)]">.</span></span>
+                            <span className="text-[10px] uppercase tracking-widest opacity-60">Toronto, CA</span>
+                        </div>
+                        <div className="hidden md:flex gap-4">
+                            <GlassToggle label="Sound" />
+                            <GlassToggle label="Grid" />
+                        </div>
+                    </nav>
+
+                    <Hero />
+
+                    <section id="work" className="py-24 px-6 md:px-24">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                             <WorkCard title="CIBC Banking" cat="Analytics Infrastructure" />
+                             <WorkCard title="Sun Life" cat="Conversion Optimization" />
+                             <WorkCard title="Data Viz" cat="Dashboards & BI" />
+                             <WorkCard title="Growth" cat="Strategy" />
+                        </div>
+                    </section>
+
+                    <section className="py-32 bg-white text-black px-6 md:px-24 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[150px] bg-gradient-to-b from-black to-transparent pointer-events-none"></div>
+                        <h2 className="font-hero text-6xl md:text-9xl font-bold mb-12 opacity-10 absolute right-0 top-20 select-none">THINKING</h2>
+                        
+                        <div className="max-w-4xl relative z-10">
+                            <p className="font-display text-3xl md:text-5xl leading-tight mb-16">
+                                "The goal isn't just to gather data. It's to find the <span className="italic border-b-2 border-black">pulse</span> within the noise."
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                                <div>
+                                    <h4 className="font-bold uppercase tracking-widest mb-4">Philosophy</h4>
+                                    <p className="text-lg opacity-70">I believe in subtractive design and additive intelligence. Every metric must earn its place on the dashboard.</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold uppercase tracking-widest mb-4">Approach</h4>
+                                    <p className="text-lg opacity-70">Seamlessly blending technical rigour with human-centric storytelling. Data is just a story waiting to be told.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <footer className="py-24 px-6 md:px-24 bg-black text-white border-t border-white/10">
+                        <div className="flex flex-col md:flex-row justify-between items-end">
+                            <div>
+                                <h2 className="font-hero text-5xl md:text-8xl mb-8">LET'S TALK</h2>
+                                <a href="mailto:manojkumar_ca@outlook.com" className="text-xl md:text-2xl text-white/50 hover:text-white transition-colors border-b border-white/20 pb-1">manojkumar_ca@outlook.com</a>
+                            </div>
+                             <div className="mt-12 md:mt-0 flex gap-8">
+                                <a href="#" className="font-display text-lg hover:underline">LinkedIn</a>
+                                <a href="#" className="font-display text-lg hover:underline">Twitter</a>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>

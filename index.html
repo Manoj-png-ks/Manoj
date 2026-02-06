@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manoj | Digital Architect</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <!-- FONTS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Outfit:wght@300;400&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #050505;
+            --silver: linear-gradient(180deg, #FFFFFF 20%, #8b9bb4 100%);
+            --arc-cyan: #00F0FF;
+            --arc-cyan-dim: rgba(0, 240, 255, 0.1);
+            --arc-pink: #FF0055;
+            --glass: rgba(10, 15, 30, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            /* Cleaner border */
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            selection-background-color: var(--arc-cyan);
+            selection-color: black;
+        }
+
+        /* --- GALAXY & STARFIELD --- */
+        .galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.1), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(14, 165, 233, 0.08), transparent 40%),
+                linear-gradient(to bottom, #020203, #08080c);
+        }
+
+        #warp-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+            mix-blend-mode: screen;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .brand-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            background: var(--silver);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.15));
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .header-strong {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: var(--arc-cyan);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-ark {
+            display: inline-flex;
+            justify-content: center;
+            items-center;
+            width: 180px;
+            height: 50px;
+            background: transparent;
+            border: 2px solid var(--arc-cyan);
+            color: var(--arc-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+
+        .btn-ark:hover {
+            background: var(--arc-cyan);
+            color: #000;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);
+        }
+
+        .btn-ark-filled {
+            background: var(--arc-cyan-dim);
+        }
+
+        /* --- FLIP CARDS --- */
+        .flip-container {
+            perspective: 1000px;
+            height: 320px;
+        }
+
+        .flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-container:hover .flip-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-front,
+        .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 20, 35, 0.7);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            /* Iron Man Corners */
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+        }
+
+        /* Corner Accents */
+        .flip-front::before,
+        .flip-back::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 15px;
+            height: 15px;
+            border-top: 2px solid var(--arc-cyan);
+            border-left: 2px solid var(--arc-cyan);
+            opacity: 0.7;
+        }
+
+        .flip-front::after,
+        .flip-back::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            border-bottom: 2px solid var(--arc-cyan);
+            border-right: 2px solid var(--arc-cyan);
+            opacity: 0.7;
+        }
+
+        .flip-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 0, 0, 0.9));
+            border-color: var(--arc-cyan);
+        }
+
+        /* --- IMPACT CARDS (LIVELY) --- */
+        .impact-card {
+            background: #080a0f;
+            /* Pitch black/blue tone */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease-out;
+            height: 420px;
+        }
+
+        .impact-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--arc-cyan);
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
+        }
+
+        /* --- NAV DIAMONDS --- */
+        .nav-marker {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 50;
+        }
+
+        .nav-diamond {
+            width: 12px;
+            height: 12px;
+            border: 2px solid #444;
+            transform: rotate(45deg);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            background: #000;
+        }
+
+        .nav-diamond::after {
+            /* Label */
+            content: attr(title);
+            position: absolute;
+            right: 30px;
+            top: -6px;
+            color: var(--arc-cyan);
+            font-family: 'Rajdhani';
+            font-weight: 700;
+            font-size: 12px;
+            opacity: 0;
+            transform: translateX(10px) rotate(-45deg);
+            transition: all 0.3s;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .nav-diamond:hover::after {
+            opacity: 1;
+            transform: translateX(0) rotate(-45deg);
+        }
+
+        .nav-diamond.active {
+            background: var(--arc-cyan);
+            border-color: var(--arc-cyan);
+            box-shadow: 0 0 15px var(--arc-cyan);
+            transform: rotate(45deg) scale(1.4);
+        }
+
+        /* --- UTILS --- */
+        .typewriter::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Bar Chart Animation */
+        @keyframes growBar {
+            from {
+                height: 0;
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .bar-anim {
+            animation: growBar 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+    </style>
+</head>
+
+<body class="opacity-0">
+
+    <div class="galaxy-bg"></div>
+    <canvas id="warp-canvas"></canvas>
+
+    <!-- FIXED NAV MARKERS -->
+    <div class="nav-marker hidden md:flex">
+        <a href="#hero" class="nav-diamond active" title="HOME"></a>
+        <a href="#method" class="nav-diamond" title="LOOP"></a>
+        <a href="#stack" class="nav-diamond" title="STACK"></a>
+        <a href="#impact" class="nav-diamond" title="IMPACT"></a>
+        <a href="#experience" class="nav-diamond" title="EXP"></a>
+    </div>
+
+    <!-- HERO -->
+    <section id="hero"
+        class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative z-10 pt-20">
+        <div class="mb-12">
+            <span
+                class="font-tech text-cyan-400 tracking-[0.3em] uppercase text-xs border border-cyan-500/30 px-4 py-2 bg-cyan-900/10 clip-path-slant">
+                ● MkS_Protocol_Final
+            </span>
+        </div>
+
+        <h1 class="flex flex-col items-center leading-none mb-12 relative cursor-default">
+            <span class="text-5xl md:text-8xl lg:text-[9rem] brand-text relative z-10 scramble-text"
+                data-final="MANOJ KUMAR">MANOJ KUMAR</span>
+            <span class="text-5xl md:text-8xl lg:text-[9rem] brand-text text-opacity-90 relative z-10 scramble-text"
+                data-final="SEKAR">SEKAR</span>
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-500/10 blur-[120px] z-0 pointer-events-none">
+            </div>
+        </h1>
+
+        <p class="text-lg md:text-2xl text-gray-300 max-w-xl mx-auto mb-16 font-tech tracking-wide leading-relaxed">
+            SENIOR DIGITAL ARCHITECT DECODING <br> THE <span class="text-white border-b border-cyan-400">INVISIBLE
+                ALGORITHMS</span> OF GROWTH.
+        </p>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <a href="#method" class="btn-ark btn-ark-filled">INITIATE</a>
+            <a href="mailto:manojkumar_ca@outlook.com" class="btn-ark">CONTACT</a>
+        </div>
+    </section>
+
+    <!-- SECTION 2: METHODOLOGY (FLIP CARDS) -->
+    <section id="method" class="py-40 px-6 max-w-7xl mx-auto relative">
+        <div class="text-center mb-24">
+            <h2 class="text-sm font-tech text-gray-500 mb-4 tracking-[0.5em]">SYSTEM_ARCH</h2>
+            <h3 class="text-4xl md:text-6xl header-strong">THE ANALYTIC LOOP</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            <div
+                class="hidden md:block absolute top-[160px] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent shadow-[0_0_10px_#00F0FF]">
+            </div>
+
+            <!-- Cards -->
+            <div class="flip-container group reveal-up">
+                <div class="flip-inner">
+                    <div class="flip-front">
+                        <div class="text-6xl font-bold font-mono text-white/10 mb-6">01</div>
+                        <h4 class="text-xl font-bold font-strong text-white">HYPOTHESIZE</h4>
+                        <div
+                            class="mt-8 w-12 h-12 rounded-full border border-cyan-500/30 flex items-center justify-center text-cyan-400 bg-black">
+                            <i data-lucide="scan-search"></i></div>
+                    </div>
+                    <div class="flip-back">
+                        <h4 class="text-lg font-bold font-strong text-cyan-300 mb-4">SCAN & DETECT</h4>
+                        <p class="text-sm text-gray-300 font-tech leading-relaxed px-4">Identify friction points in the
+                            user stream using anomaly detection algorithms.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-container group reveal-up" style="transition-delay: 0.1s">
+                <div class="flip-inner">
+                    <div class="flip-front">
+                        <div class="text-6xl font-bold font-mono text-white/10 mb-6">02</div>
+                        <h4 class="text-xl font-bold font-strong text-white">ARCHITECT</h4>
+                        <div
+                            class="mt-8 w-12 h-12 rounded-full border border-cyan-500/30 flex items-center justify-center text-cyan-400 bg-black">
+                            <i data-lucide="database-zap"></i></div>
+                    </div>
+                    <div class="flip-back">
+                        <h4 class="text-lg font-bold font-strong text-cyan-300 mb-4">BUILD SCHEMA</h4>
+                        <p class="text-sm text-gray-300 font-tech leading-relaxed px-4">Construct the tracking matrix.
+                            Deploy complex SQL logic to capture the truth.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-container group reveal-up" style="transition-delay: 0.2s">
+                <div class="flip-inner">
+                    <div class="flip-front">
+                        <div class="text-6xl font-bold font-mono text-white/10 mb-6">03</div>
+                        <h4 class="text-xl font-bold font-strong text-white">VISUALIZE</h4>
+                        <div
+                            class="mt-8 w-12 h-12 rounded-full border border-cyan-500/30 flex items-center justify-center text-cyan-400 bg-black">
+                            <i data-lucide="layout-dashboard"></i></div>
+                    </div>
+                    <div class="flip-back">
+                        <h4 class="text-lg font-bold font-strong text-cyan-300 mb-4">RENDER DATA</h4>
+                        <p class="text-sm text-gray-300 font-tech leading-relaxed px-4">Translate raw logs into tactical
+                            Tableau dashboards for C-Suite review.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-container group reveal-up" style="transition-delay: 0.3s">
+                <div class="flip-inner">
+                    <div class="flip-front">
+                        <div class="text-6xl font-bold font-mono text-white/10 mb-6">04</div>
+                        <h4 class="text-xl font-bold font-strong text-white">SCALE</h4>
+                        <div
+                            class="mt-8 w-12 h-12 rounded-full border border-cyan-500/30 flex items-center justify-center text-cyan-400 bg-black">
+                            <i data-lucide="infinity"></i></div>
+                    </div>
+                    <div class="flip-back">
+                        <h4 class="text-lg font-bold font-strong text-cyan-300 mb-4">OPTIMIZE</h4>
+                        <p class="text-sm text-gray-300 font-tech leading-relaxed px-4">Automate the solution using
+                            Python pipelines. Reinforce the growth loop.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: STACK -->
+    <section id="stack" class="py-40 px-6 max-w-7xl mx-auto border-t border-white/5">
+        <div class="mb-20">
+            <h2 class="text-sm font-tech text-gray-500 mb-4 tracking-[0.5em]">CAPABILITIES</h2>
+            <h3 class="text-4xl md:text-5xl header-strong">ENGINE ROOM</h3>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div
+                class="p-6 border border-white/10 bg-white/5 rounded-lg flex flex-col gap-4 hover:border-cyan-400 transition-colors group">
+                <i data-lucide="database" class="text-gray-400 group-hover:text-cyan-400 w-8 h-8"></i>
+                <div>
+                    <h4 class="font-bold font-strong text-white text-lg">SQL</h4>
+                    <p class="text-[10px] uppercase font-tech text-cyan-500">BigQuery</p>
+                </div>
+            </div>
+            <div
+                class="p-6 border border-white/10 bg-white/5 rounded-lg flex flex-col gap-4 hover:border-cyan-400 transition-colors group">
+                <i data-lucide="bar-chart-2" class="text-gray-400 group-hover:text-cyan-400 w-8 h-8"></i>
+                <div>
+                    <h4 class="font-bold font-strong text-white text-lg">ADOBE</h4>
+                    <p class="text-[10px] uppercase font-tech text-cyan-500">Analytics Master</p>
+                </div>
+            </div>
+            <div
+                class="p-6 border border-white/10 bg-white/5 rounded-lg flex flex-col gap-4 hover:border-cyan-400 transition-colors group">
+                <i data-lucide="code-2" class="text-gray-400 group-hover:text-cyan-400 w-8 h-8"></i>
+                <div>
+                    <h4 class="font-bold font-strong text-white text-lg">PYTHON</h4>
+                    <p class="text-[10px] uppercase font-tech text-cyan-500">Pandas automation</p>
+                </div>
+            </div>
+            <div
+                class="p-6 border border-white/10 bg-white/5 rounded-lg flex flex-col gap-4 hover:border-cyan-400 transition-colors group">
+                <i data-lucide="layers" class="text-gray-400 group-hover:text-cyan-400 w-8 h-8"></i>
+                <div>
+                    <h4 class="font-bold font-strong text-white text-lg">TABLEAU</h4>
+                    <p class="text-[10px] uppercase font-tech text-cyan-500">Visualization</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: IMPACT (THE LIVELY 3RD PICTURE) -->
+    <section id="impact" class="py-40 px-6 max-w-7xl mx-auto">
+        <div class="mb-24 flex items-end gap-8">
+            <h2 class="text-6xl md:text-8xl brand-text">IMPACT</h2>
+            <div class="h-[1px] bg-gradient-to-r from-white to-transparent flex-1 mb-8 opacity-20"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- 1: ATTRIBUTION -->
+            <div class="impact-card p-8 flex flex-col justify-between group cursor-pointer">
+                <div>
+                    <div
+                        class="w-10 h-10 rounded-full border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6">
+                        <i data-lucide="crosshair" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold font-strong text-white mb-2">ATTRIBUTION</h3>
+                    <p class="text-sm text-gray-400 font-tech">Multi-touch implementation shifting $2M+ ad spend.</p>
+                </div>
+
+                <!-- LIVELY CHARTS -->
+                <div class="mt-8 flex items-end gap-2 h-32 w-full pb-2">
+                    <div class="w-1/3 bg-gray-800 rounded-t-sm bar-anim" style="height: 40%; animation-delay: 0.2s">
+                    </div>
+                    <div class="w-1/3 bg-gray-700 rounded-t-sm bar-anim" style="height: 65%; animation-delay: 0.4s">
+                    </div>
+                    <div class="w-1/3 bg-cyan-400 rounded-t-sm bar-anim shadow-[0_0_20px_#00F0FF]"
+                        style="height: 90%; animation-delay: 0.6s"></div>
+                </div>
+                <div class="absolute bottom-6 left-8 text-4xl font-black font-strong text-white">
+                    21%
+                </div>
+            </div>
+
+            <!-- 2: BEHAVIOR -->
+            <div class="impact-card p-8 flex flex-col justify-between group cursor-pointer">
+                <div>
+                    <div
+                        class="w-10 h-10 rounded-full border border-pink-500/20 flex items-center justify-center text-pink-500 mb-6">
+                        <i data-lucide="fingerprint" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold font-strong text-white mb-2">BEHAVIOR</h3>
+                    <p class="text-sm text-gray-400 font-tech">Funnel theory reducing application drop-off.</p>
+                </div>
+
+                <!-- LIVELY PULSE -->
+                <div class="relative w-full h-32 flex items-center justify-center">
+                    <div class="absolute w-24 h-24 border border-pink-500/30 rounded-full animate-ping"></div>
+                    <div class="absolute w-16 h-16 border border-pink-500/60 rounded-full animate-ping"
+                        style="animation-duration: 2s; animation-delay: 0.5s"></div>
+                    <div class="text-4xl font-black font-strong text-pink-500 relative z-10">17%</div>
+                </div>
+            </div>
+
+            <!-- 3: AUTOMATION -->
+            <div class="impact-card p-8 flex flex-col justify-between group cursor-pointer">
+                <div>
+                    <div
+                        class="w-10 h-10 rounded-full border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold font-strong text-white mb-2">AUTOMATION</h3>
+                    <p class="text-sm text-gray-400 font-tech">Python pipelines replacing manual work.</p>
+                </div>
+
+                <!-- LIVELY CODE -->
+                <div class="mt-4 font-code text-xs text-emerald-500 opacity-80 h-24 overflow-hidden">
+                    <span class="text-gray-600">// initializing...</span><br>
+                    > data_stream = True<br>
+                    > optimizing_flow...<br>
+                    > efficiency = <span class="text-emerald-300">70%</span><span class="typewriter"></span>
+                </div>
+                <div class="text-right">
+                    <div class="text-4xl font-black font-strong text-emerald-400">70%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: TRAJECTORY -->
+    <section id="experience" class="py-40 px-6 relative overflow-hidden">
+        <div class="max-w-6xl mx-auto space-y-32">
+            <div
+                class="flex flex-col md:flex-row gap-12 items-center reveal-left relative border-l border-cyan-900/50 pl-8 md:pl-0 md:border-l-0">
+                <div class="md:w-1/2 text-right relative z-10">
+                    <h3 class="text-5xl font-bold font-strong text-white mb-2">CIBC</h3>
+                    <p class="font-code text-cyan-400 tracking-widest text-sm mb-6">SENIOR ANALYST // PRESENT</p>
+                    <p class="text-lg text-gray-400 leading-relaxed font-light border-r-2 border-cyan-500/30 pr-6">
+                        Architecting the "Digital Brain". End-to-end lineage from click to credit approval.
+                    </p>
+                </div>
+                <div
+                    class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-black border-2 border-cyan-500 rotate-45 z-20 shadow-[0_0_10px_#00F0FF]">
+                </div>
+                <div class="md:w-1/2 md:pl-12 space-y-4 relative z-10">
+                    <div class="p-6 border border-white/5 bg-white/5 rounded flex gap-4 items-center">
+                        <i data-lucide="activity" class="text-cyan-400"></i>
+                        <div>
+                            <h4 class="font-bold font-strong text-white text-lg mb-1">Adobe Analytics</h4>
+                            <p class="text-xs text-gray-400">Full-funnel tracking.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="flex flex-col md:flex-row gap-12 items-center reveal-right relative border-l border-cyan-900/50 pl-8 md:pl-0 md:border-l-0">
+                <div class="md:w-1/2 md:pr-12 space-y-4 order-2 md:order-1 relative z-10">
+                    <div class="p-6 border border-white/5 bg-white/5 rounded flex gap-4 items-center">
+                        <i data-lucide="bar-chart" class="text-cyan-400"></i>
+                        <div>
+                            <h4 class="font-bold font-strong text-white text-lg mb-1">Tableau</h4>
+                            <p class="text-xs text-gray-400">C-Suite Dashboarding.</p>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-black border-2 border-cyan-500 rotate-45 z-20 shadow-[0_0_10px_#00F0FF]">
+                </div>
+                <div class="md:w-1/2 text-left order-1 md:order-2 relative z-10">
+                    <h3 class="text-5xl font-bold font-strong text-white mb-2">SUN LIFE</h3>
+                    <p class="font-code text-cyan-400 tracking-widest text-sm mb-6">MARKETING ANALYST // 2022</p>
+                    <p class="text-lg text-gray-400 leading-relaxed font-light border-l-2 border-cyan-500/30 pl-6">
+                        Server-Side tracking migration. Improved data fidelity and site performance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-32 text-center border-t border-white/5 bg-black relative">
+        <h2 class="text-xs font-tech text-gray-600 mb-8 tracking-[0.5em]">END_TRANSMISSION</h2>
+        <a href="mailto:manojkumar_ca@outlook.com"
+            class="text-2xl md:text-5xl font-bold font-strong text-white hover:text-cyan-400 transition-colors block mb-12">manojkumar_ca@outlook.com</a>
+
+        <div class="flex justify-center gap-6 mb-12">
+            <a href="https://www.linkedin.com/in/manoj-kumar0911/" target="_blank"
+                class="flex items-center gap-2 px-8 py-4 border border-gray-800 rounded hover:border-cyan-400 hover:text-cyan-400 hover:bg-cyan-900/10 transition-all">
+                <i data-lucide="linkedin" class="w-5 h-5"></i>
+                <span class="font-tech text-xs tracking-widest font-bold">CONNECT_LINKEDIN</span>
+            </a>
+        </div>
+
+        <div class="mt-12 text-gray-800 font-tech text-[10px] uppercase tracking-widest">System Design © 2026 Manoj
+            Kumar</div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        gsap.registerPlugin(ScrollTrigger);
+        const lenis = new Lenis({ duration: 1.2, smooth: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        // --- WARP ---
+        const canvas = document.getElementById('warp-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [], speed = 2, scrollSpeed = 0;
+        const initStars = () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; stars = Array.from({ length: 400 }, () => ({ x: Math.random() * width - width / 2, y: Math.random() * height - height / 2, z: Math.random() * width })); };
+        const drawStars = () => { ctx.fillStyle = 'rgba(5,5,8,0.4)'; ctx.fillRect(0, 0, width, height); ctx.fillStyle = "#A5F3FC"; let cs = speed + (scrollSpeed * 0.5); stars.forEach(s => { s.z -= cs; if (s.z <= 0) { s.x = Math.random() * width - width / 2; s.y = Math.random() * height - height / 2; s.z = width; } const sx = (s.x / s.z) * width + width / 2, sy = (s.y / s.z) * height + height / 2, size = (1 - s.z / width) * 2.5; if (sx > 0 && sx < width && sy > 0 && sy < height) { ctx.beginPath(); ctx.arc(sx, sy, size, 0, Math.PI * 2); ctx.fill(); } }); scrollSpeed *= 0.9; requestAnimationFrame(drawStars); };
+        window.addEventListener('resize', initStars); initStars(); drawStars();
+        lenis.on('scroll', (e) => scrollSpeed = Math.abs(e.velocity));
+
+        // --- ACTIVE NAV ---
+        window.addEventListener('scroll', () => {
+            const sections = ['hero', 'method', 'stack', 'impact', 'experience'];
+            let current = '';
+            sections.forEach(sec => { if (window.scrollY >= (document.getElementById(sec).offsetTop - 400)) current = sec; });
+            document.querySelectorAll('.nav-diamond').forEach(d => {
+                d.classList.remove('active');
+                if (d.getAttribute('href').includes(current)) d.classList.add('active');
+            });
+        });
+
+        // --- SCRAMBLE TEXT ---
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        document.querySelectorAll('.scramble-text').forEach(el => {
+            const final = el.dataset.final;
+            const run = () => {
+                let iter = 0;
+                const i = setInterval(() => {
+                    el.innerText = final.split('').map((l, j) => j < iter ? final[j] : chars[Math.floor(Math.random() * chars.length)]).join('');
+                    if (iter >= final.length) clearInterval(i);
+                    iter += 1 / 2;
+                }, 30);
+            };
+            el.addEventListener('mouseenter', run);
+            run();
+        });
+
+        // --- REVEALS ---
+        gsap.to("body", { opacity: 1, duration: 1.5 });
+        gsap.utils.toArray('.reveal-up').forEach(el => gsap.from(el, { scrollTrigger: { trigger: el, start: "top 85%" }, y: 50, opacity: 0, duration: 0.8 }));
+        gsap.utils.toArray('.reveal-left').forEach(el => gsap.from(el, { scrollTrigger: { trigger: el, start: "top 80%" }, x: -50, opacity: 0, duration: 1 }));
+        gsap.utils.toArray('.reveal-right').forEach(el => gsap.from(el, { scrollTrigger: { trigger: el, start: "top 80%" }, x: 50, opacity: 0, duration: 1 }));
+
+    </script>
+</body>
+
+</html>
