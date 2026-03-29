@@ -3,12 +3,12 @@ import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadius
 import { motion } from 'framer-motion';
 
 const data = [
-    { subject: 'Digital Analytics', A: 95, fullMark: 100 },
+    { subject: 'Adobe Analytics / GA4', A: 95, fullMark: 100 },
     { subject: 'Tag Management', A: 90, fullMark: 100 },
-    { subject: 'SQL & Python', A: 85, fullMark: 100 },
-    { subject: 'Testing (A/B)', A: 88, fullMark: 100 },
-    { subject: 'Visualization', A: 92, fullMark: 100 },
-    { subject: 'Cloud (GCP/AWS)', A: 80, fullMark: 100 },
+    { subject: 'SQL & Python', A: 88, fullMark: 100 },
+    { subject: 'A/B & MVT Testing', A: 90, fullMark: 100 },
+    { subject: 'BI & Visualization', A: 92, fullMark: 100 },
+    { subject: 'Cloud (GCP/AWS/Azure)', A: 82, fullMark: 100 },
 ];
 
 const SkillsChart = () => {
@@ -36,8 +36,8 @@ const SkillsChart = () => {
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { label: 'Adobe Analytics & GA4', val: 'Expert' },
-                                { label: 'Tableau & Power BI', val: 'Advanced' },
-                                { label: 'SQL & BigQuery', val: 'Proficient' },
+                                { label: 'Power BI, Tableau & Looker', val: 'Advanced' },
+                                { label: 'SQL, Python & BigQuery', val: 'Proficient' },
                                 { label: 'Adobe Target & Optimizely', val: 'Expert' }
                             ].map((skill, i) => (
                                 <div key={i} className="bg-glass p-4">

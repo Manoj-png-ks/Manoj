@@ -6,7 +6,7 @@ const certs = [
     "Google Analytics 4 (GA4) Certification",
     "Microsoft Certified: Data Analyst Associate (Power BI)",
     "Google Tag Manager Fundamentals",
-    "Adobe Analytics Business Practitioner",
+    "Adobe Analytics Business Practitioner Expert",
     "Optimizely Experimentation Practitioner"
 ];
 

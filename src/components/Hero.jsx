@@ -44,7 +44,7 @@ const Hero = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <h2 className="text-xl md:text-2xl text-cyan mb-4 tracking-widest uppercase font-semibold">Digital Analytics Analyst</h2>
+                    <h2 className="text-xl md:text-2xl text-cyan mb-4 tracking-widest uppercase font-semibold">Strategic Digital Analytics & Growth Intelligence</h2>
                     <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-gray-400"
                         style={{ backgroundImage: 'linear-gradient(to right, #fff, #a5b4fc)' }}>
                         MANOJ KUMAR SEKAR

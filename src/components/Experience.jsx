@@ -5,26 +5,38 @@ import { Briefcase, TrendingUp, Users, Target } from 'lucide-react';
 const experiences = [
     {
         company: "CIBC",
-        role: "Senior Analyst - Digital Banking",
-        period: "09/2023 - Present",
+        role: "Senior Analyst - Digital Analytics",
+        period: "06/2024 - Present",
         location: "Toronto, ON",
         achievements: [
-            { text: "Optimized media spend & boosted conversion ROI", metric: "+21%" },
-            { text: "Improved personal loan form completion via UX", metric: "+18%" },
-            { text: "Increased email-to-application conversions", metric: "+12%" },
-            { text: "Improved 90-day retention for Smart Accounts", metric: "+14%" },
+            { text: "Improved campaign ROI via multi-touch attribution overhaul", metric: "+21%" },
+            { text: "Increased mortgage & loan application completion rates", metric: "+18%" },
+            { text: "Improved cross-sell targeting accuracy with propensity modeling", metric: "+24%" },
+            { text: "Improved 90-day account retention via cohort-based campaigns", metric: "+14%" },
         ]
     },
     {
         company: "Sun Life Financial",
-        role: "Digital Marketing & Analytics Analyst",
-        period: "05/2022 - 06/2023",
+        role: "Digital Analytics & Marketing Performance Analyst",
+        period: "06/2023 - 05/2024",
         location: "Toronto, ON",
         achievements: [
-            { text: "Reduced credit card application abandonment", metric: "-17%" },
-            { text: "Boosted mobile task completion rate via UI updates", metric: "+22%" },
-            { text: "Reduced manual reporting time with Python", metric: "-70%" },
-            { text: "Reallocated paid media spend for better ROI", metric: "20%" },
+            { text: "Reduced form abandonment on insurance & investment funnels", metric: "-17%" },
+            { text: "Increased qualified lead generation from UX optimization", metric: "+15%" },
+            { text: "Reduced automated campaign reporting turnaround time", metric: "-70%" },
+            { text: "Improved marketing efficiency via blended attribution model", metric: "+18%" },
+        ]
+    },
+    {
+        company: "Accenture Digital",
+        role: "Digital Analytics Consultant – Enterprise Transfer",
+        period: "06/2022 - 05/2023",
+        location: "Toronto, ON",
+        achievements: [
+            { text: "Reduced reporting latency for executive dashboards", metric: "-45%" },
+            { text: "Improved return on ad spend for key client accounts", metric: "+20%" },
+            { text: "Reduced manual reporting effort via ETL automation", metric: "-50%" },
+            { text: "Double-digit conversion recovery within one quarter", metric: "10%+" },
         ]
     }
 ];
